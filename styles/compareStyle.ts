@@ -1,0 +1,121 @@
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+    container: {
+        padding: 16,
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: "bold",
+        textAlign: "center",
+        color: "#d63384",
+        marginBottom: 20,
+    },
+    cardContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 24,
+    },
+    productCard: {
+        width: "30%",
+        alignItems: "center",
+        borderRadius: 14,
+        padding: 10,
+        shadowColor: "#ccc",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        elevation: 2,
+    },
+    platformBadge: {
+        backgroundColor: "#ff69b4",
+        color: "#fff",
+        fontWeight: "bold",
+        paddingVertical: 2,
+        paddingHorizontal: 8,
+        borderRadius: 10,
+        fontSize: 12,
+        marginBottom: 6,
+    },
+    productImage: {
+        width: 70,
+        height: 70,
+        resizeMode: "contain",
+    },
+    platformLogo: {
+        width: 50,
+        height: 20,
+        resizeMode: "contain",
+        marginVertical: 6,
+    },
+    price: {
+        color: "#dc3545",
+        fontWeight: "bold",
+        fontSize: 14,
+    },
+    buyButton: {
+        marginTop: 8,
+        backgroundColor: "#ff69b4",
+        borderRadius: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+    },
+    buyButtonText: {
+        color: "#fff",
+        fontSize: 11,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 14,
+        color: "#20c997",
+    },
+    table: {
+        backgroundColor: "#fff5fb",
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#f8d7da",
+        overflow: "hidden",
+    },
+    tableHeader: {
+        backgroundColor: "#fce4ec",
+    },
+    tableRow: {
+        flexDirection: "row",
+        borderBottomWidth: 0.5,
+        borderColor: "#f3c6cb",
+        paddingVertical: 12,
+        alignItems: "center",
+    },
+    labelCell: {
+        flex: 1.6,
+        fontWeight: "600",
+        paddingHorizontal: 8,
+        fontSize: 13,
+        color: "#343a40",
+    },
+    valueCell: {
+        flex: 1,
+        textAlign: "center",
+        fontSize: 13,
+        color: "#495057",
+    },
+    valueCellHeader: {
+        flex: 1,
+        textAlign: "center",
+        fontSize: 13,
+        fontWeight: "bold",
+        color: "#d63384",
+    },
+    backButton: {
+        marginTop: 20,
+        padding: 10,
+        backgroundColor: "#f0f",
+        borderRadius: 8,
+        alignItems: "center",
+    },
+    backButtonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+})
