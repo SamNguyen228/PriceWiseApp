@@ -22,6 +22,10 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const handleComingSoon = () => {
+    Alert.alert("Thông báo", "Tính năng đang phát triển");
+  };
+
   useEffect(() => {
     const loadRemembered = async () => {
       const savedEmail = await AsyncStorage.getItem('remember_email');
@@ -169,13 +173,13 @@ export default function SignInScreen() {
       <View style={styles.separator} />
 
       <View style={styles.socialButtons}>
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity style={styles.socialButton} onPress={handleComingSoon}>
           <FontAwesome name="apple" size={40} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity style={styles.socialButton} onPress={handleComingSoon}>
           <FontAwesome name="google" size={40} color="#DB4437" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
+        <TouchableOpacity style={styles.socialButton} onPress={handleComingSoon}>
           <FontAwesome name="facebook" size={40} color="#3b5998" />
         </TouchableOpacity>
       </View>
@@ -193,78 +197,78 @@ export default function SignInScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
+  container: {
+    flex: 1,
     backgroundColor: '#fff',
-    padding: 20, 
+    padding: 20,
     alignItems: 'center',
     paddingTop: 90,
   },
-  logo: { 
-    width: 100, 
+  logo: {
+    width: 100,
     height: 100,
-    marginBottom: 20 
+    marginBottom: 20
   },
-  title: { 
+  title: {
     fontSize: 24,
-    fontWeight: 'bold', 
-    marginBottom: 30 
+    fontWeight: 'bold',
+    marginBottom: 30
   },
   input: {
-    width: '100%', 
-    height: 50, 
+    width: '100%',
+    height: 50,
     backgroundColor: '#f0f0f0',
-    borderRadius: 10, 
-    marginBottom: 20, 
+    borderRadius: 10,
+    marginBottom: 20,
     paddingHorizontal: 15,
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: '#aaa',
   },
-  passwordContainer: { 
+  passwordContainer: {
     width: '100%',
-    position: 'relative' 
+    position: 'relative'
   },
   icon: {
     position: 'absolute',
-    right: 15, 
-    top: 15 
+    right: 15,
+    top: 15
   },
   button: {
     backgroundColor: '#D17842',
     paddingVertical: 12,
     paddingHorizontal: 30,
-    borderRadius: 10, 
-    width: '100%', 
-    alignItems: 'center', 
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
     marginVertical: 10,
   },
   buttonText: {
-    color: '#fff', 
+    color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16 
+    fontSize: 16
   },
   socialText: {
     marginTop: 15,
-    fontSize: 14, 
-    color: '#444', 
-    textAlign: 'center' 
+    fontSize: 14,
+    color: '#444',
+    textAlign: 'center'
   },
-  separator: { 
-    height: 1, 
-    width: '100%', 
+  separator: {
+    height: 1,
+    width: '100%',
     backgroundColor: '#ccc',
-    marginVertical: 10 
+    marginVertical: 10
   },
   socialButtons: {
-    flexDirection: 'row', 
-    marginTop: 10, 
-    width: '100%', 
+    flexDirection: 'row',
+    marginTop: 10,
+    width: '100%',
     justifyContent: 'space-between',
   },
-  socialButton: { 
+  socialButton: {
     flex: 1,
     alignItems: 'center',
-    marginHorizontal: 5 
+    marginHorizontal: 5
   },
   rowContainer: {
     flexDirection: 'row',
@@ -273,9 +277,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     width: '100%',
   },
-  checkbox: { 
-    marginRight: 5, 
-    color: '#D17842' 
+  checkbox: {
+    marginRight: 5,
+    color: '#D17842'
   },
   rememberMeGroup: {
     flexDirection: 'row',

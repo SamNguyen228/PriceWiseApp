@@ -28,6 +28,7 @@ export const addToFavorites = (productId: number, userId: number, productPlatfor
   });
 };
 
+
 export const removeFromFavorites = (productId: number, userId: number, productPlatformId: number) => {
   return axios.delete(`${BASE_URL}/favorites/remove`, {
     params: {
