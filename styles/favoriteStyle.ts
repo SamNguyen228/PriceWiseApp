@@ -74,11 +74,13 @@ export default StyleSheet.create({
         backgroundColor: "#fff",
     },
     scrollContent: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        paddingTop: 20,
         paddingBottom: 100,
+        paddingTop: 10,
+    },
+    fullWidthCenter: {
+        width: '100%',
+        alignItems: 'center',
+        marginBottom: 16,
     },
     resultTitle: {
         fontSize: 20,

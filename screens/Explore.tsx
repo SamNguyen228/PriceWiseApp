@@ -1,26 +1,27 @@
+import RefreshWrapper from '@/components/RefreshWrapper';
+import TripleRingLoader from '@/components/TripleRingLoader';
+import CategoryFilterModal from '@/components/explore/CategoryFilterModal';
+import CategorySuggestionGrid from '@/components/explore/CategorySuggestionGrid';
+import EmptySearch from '@/components/explore/EmptySearch';
+import ImageSearchButton from '@/components/explore/ImageSearchButton';
+import PriceFilterModal from '@/components/explore/PriceFilterModal';
+import ProductSearchCard from '@/components/explore/ProductSearchCard';
+import { categories } from '@/constants/categories';
+import { addToFavorites, BASE_URL, removeFromFavorites, search } from '@/constants/constants';
+import { useFavorites } from '@/hooks/useFavorites';
+import { FontAwesome } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
-  View,
+  Alert,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
+  View,
 } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { BASE_URL, search, addToFavorites, removeFromFavorites } from '@/constants/constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import RefreshWrapper from '@/components/RefreshWrapper';
-import axios from 'axios';
-import TripleRingLoader from '@/components/TripleRingLoader';
-import PriceFilterModal from '@/components/explore/PriceFilterModal';
-import CategoryFilterModal from '@/components/explore/CategoryFilterModal';
-import EmptySearch from '@/components/explore/EmptySearch';
 import exploreStyle from '../styles/exploreStyle';
-import ProductSearchCard from '@/components/explore/ProductSearchCard';
-import CategorySuggestionGrid from '@/components/explore/CategorySuggestionGrid';
-import { categories } from '@/constants/categories';
-import { useFavorites } from '@/hooks/useFavorites';
 
 interface ProductItem {
   logo_url?: string;
@@ -40,10 +41,12 @@ type ResultItem = {
   shipping_fee: number;
   product_url: string;
   product: {
+    product_name: string;
     image_url: string;
   };
   platform: {
     name: string;
+    logo_url: string;
   };
 };
 
@@ -62,6 +65,8 @@ export default function Explore() {
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [results, setResults] = useState<ResultItem[]>([]);
+  const [imageSearchResults, setImageSearchResults] = useState<ResultItem[]>([]);
+  const [isImageSearch, setIsImageSearch] = useState(false);
   const { favoriteIds, setFavoriteIds } = useFavorites();
 
   useEffect(() => {
@@ -85,6 +90,8 @@ export default function Explore() {
       .then((data) => {
         setProducts(data || []);
         setResults([]);
+        setImageSearchResults([]);
+        setIsImageSearch(false);
       })
       .catch((err) => {
         console.error("Fetch error:", err);
@@ -111,11 +118,11 @@ export default function Explore() {
           updated.delete(productPlatformId);
           return updated;
         });
-        Alert.alert("Đã xoá khỏi yêu thích");
+        Alert.alert("Thông Báo", "Đã xoá khỏi yêu thích");
       } else {
         await addToFavorites(productId, userId, productPlatformId);
         setFavoriteIds((prev) => new Set(prev).add(productPlatformId));
-        Alert.alert("Đã thêm vào yêu thích");
+        Alert.alert("Thông Báo", "Đã thêm vào yêu thích");
       }
     } catch (error) {
       console.error("Lỗi khi xử lý yêu thích:", error);
@@ -134,6 +141,7 @@ export default function Explore() {
       const userId = parseInt(userIdStr);
 
       setLoading(true);
+      setIsImageSearch(false);
 
       // Gọi API tìm kiếm
       const res = await search(searchText);
@@ -157,6 +165,7 @@ export default function Explore() {
           shipping_fee: pf.shipping_fee,
           product_url: pf.product_url,
           product: {
+            product_name: product.name,
             image_url: product.image_url || '',
           },
           platform: {
@@ -170,12 +179,37 @@ export default function Explore() {
       );
 
       setResults(filtered);
+      setImageSearchResults([]);
     } catch (error) {
       console.error('Search error:', error);
       Alert.alert("Lỗi", "Không thể tìm kiếm sản phẩm.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageSearchResults = (imageResults: any[]) => {
+    setIsImageSearch(true);
+    
+    // Chuyển đổi cấu trúc dữ liệu để tương thích với ResultItem
+    const convertedResults: ResultItem[] = imageResults.map((item: any) => ({
+      product_id: item.product_id,
+      product_platform_id: item.product_platform_id,
+      platform_id: item.platform_id,
+      price: item.price,
+      shipping_fee: item.shipping_fee,
+      product_url: item.product_url,
+      product: {
+        image_url: item.product?.image_url || '',
+        name: item.product?.name || '',
+      },
+      platform: {
+        name: item.platform?.name || '',
+      },
+    }));
+    
+    setImageSearchResults(convertedResults);
+    setResults([]);
   };
 
   const handleRefreshExplore = async () => {
@@ -188,6 +222,8 @@ export default function Explore() {
       const data = await res.json();
       setProducts(data || []);
       setResults([]);
+      setImageSearchResults([]);
+      setIsImageSearch(false);
     } catch (err) {
       console.error("Refresh error:", err);
       setProducts([]);
@@ -202,7 +238,8 @@ export default function Explore() {
     imageUrl: string,
     name: string,
     price: number,
-    platformName?: string
+    platformName?: string,
+    platformLogo?: string
   ) => (
     <ProductSearchCard
       key={`product-${productPlatformId}`}
@@ -212,35 +249,82 @@ export default function Explore() {
       name={name}
       price={price}
       platformName={platformName}
+      platformLogo={platformLogo}
       isFavorite={favoriteIds.has(productPlatformId)}
       onToggleFavorite={() => toggleFavorite(productId, productPlatformId)}
     />
   );
 
-  const displayProducts = results.length > 0
-    ? results.map((item) =>
-      renderProductCard(
-        Number(item.product_id),
-        Number(item.product_platform_id),
-        item.product.image_url,
-        '',
-        item.price,
-        item.platform.name
-      )
-    )
-    : products
-      .filter((p) => p.price >= minPrice && p.price <= maxPrice)
-      .map((p) =>
+  // const displayProducts = results.length > 0
+  //   ? results.map((item) =>
+  //     renderProductCard(
+  //       Number(item.product_id),
+  //       Number(item.product_platform_id),
+  //       item.product.image_url,
+  //       item.product.product_name,
+  //       item.price,
+  //       item.platform.name,
+  //     )
+
+  //   )
+  //   : products
+  //     .filter((p) => p.price >= minPrice && p.price <= maxPrice)
+  //     .map((p) =>
+  //       renderProductCard(
+  //         p.product_id,
+  //         p.product_platform_id,
+  //         p.image_url,
+  //         p.name,
+  //         p.price,
+  //         p.platform,
+  //       )
+  //     );
+
+  const displayProducts = () => {
+    if (isImageSearch && imageSearchResults.length > 0) {
+      // Áp dụng filter cho kết quả tìm kiếm bằng hình ảnh
+      const filteredImageResults = imageSearchResults.filter(
+        (item) => item.price >= minPrice && item.price <= maxPrice
+      );
+      return filteredImageResults.map((item) =>
         renderProductCard(
-          p.product_id,
-          p.product_platform_id,
-          p.image_url,
-          p.name,
-          p.price,
-          p.platform
+          Number(item.product_id),
+          Number(item.product_platform_id),
+          item.product.image_url,
+          item.product.name || '',
+          item.price,
+          item.platform.name
         )
       );
-
+    } else if (results.length > 0) {
+      const filteredResults = results.filter(
+        (item) => item.price >= minPrice && item.price <= maxPrice
+      );
+      return filteredResults.map((item) =>
+        renderProductCard(
+          Number(item.product_id),
+          Number(item.product_platform_id),
+          item.product.image_url,
+          item.product.name || '',
+          item.price,
+          item.platform.name
+        )
+      );
+    } else {
+      return products
+        .filter((p) => p.price >= minPrice && p.price <= maxPrice)
+        .map((p) =>
+          renderProductCard(
+            p.product_id,
+            p.product_platform_id,
+            p.image_url,
+            p.name,
+            p.price,
+            p.platform
+          )
+        );
+    }
+  };
 
   if (loading) {
     return (
@@ -265,9 +349,13 @@ export default function Explore() {
           onChangeText={setSearchText}
           onSubmitEditing={handleSearch}
         />
-        <TouchableOpacity onPress={handleSearch}>
-          <FontAwesome name="search" size={20} color="#333" style={{ marginLeft: 8, color: '#007BFF' }} />
+        <TouchableOpacity onPress={handleSearch} style={exploreStyle.searchButton}>
+          <FontAwesome name="search" size={20} color="#007BFF" />
         </TouchableOpacity>
+        <ImageSearchButton
+          onSearchResults={handleImageSearchResults}
+          onLoadingChange={setLoading}
+        />
       </View>
 
       {/* Filter options */}
@@ -311,7 +399,7 @@ export default function Explore() {
         onClose={() => setShowCategoryFilter(false)}
       />
 
-      <RefreshWrapper onRefresh={handleRefreshExplore} style={{ paddingBottom: 100 }}>
+      {/* <RefreshWrapper onRefresh={handleRefreshExplore} style={{ paddingBottom: 100 }}>
         {searchText ? (
           <Text style={exploreStyle.resultsText}>{results.length} kết quả cho "{searchText}"</Text>
         ) : null}
@@ -324,6 +412,56 @@ export default function Explore() {
         ) : (
           <View style={exploreStyle.productRow}>{displayProducts}</View>
         )}
+      </RefreshWrapper> */}
+
+       <RefreshWrapper onRefresh={handleRefreshExplore} style={{ paddingBottom: 100 }}>
+        {/* Hiển thị thông báo kết quả */}
+        {isImageSearch && imageSearchResults.length > 0 && (
+          <Text style={exploreStyle.resultsText}>
+            {imageSearchResults.filter((item) => item.price >= minPrice && item.price <= maxPrice).length} kết quả tìm kiếm bằng hình ảnh
+          </Text>
+        )}
+        
+        {searchText && results.length > 0 && (
+          <Text style={exploreStyle.resultsText}>
+            {results.filter((item) => item.price >= minPrice && item.price <= maxPrice).length} kết quả cho "{searchText}"
+          </Text>
+        )}
+
+        {/* Hiển thị kết quả hoặc nội dung khác */}
+        {(() => {
+          // Kiểm tra kết quả tìm kiếm bằng hình ảnh
+          if (isImageSearch && imageSearchResults.length > 0) {
+            const filteredResults = imageSearchResults.filter(
+              (item) => item.price >= minPrice && item.price <= maxPrice
+            );
+            if (filteredResults.length > 0) {
+              return <View style={exploreStyle.productRow}>{displayProducts()}</View>;
+            } else {
+              return <EmptySearch />;
+            }
+          }
+          
+          // Kiểm tra kết quả tìm kiếm text
+          if (searchText && results.length > 0) {
+            const filteredResults = results.filter(
+              (item) => item.price >= minPrice && item.price <= maxPrice
+            );
+            if (filteredResults.length > 0) {
+              return <View style={exploreStyle.productRow}>{displayProducts()}</View>;
+            } else {
+              return <EmptySearch />;
+            }
+          }
+          
+          // Kiểm tra sản phẩm theo danh mục
+          if (products.length > 0) {
+            return <View style={exploreStyle.productRow}>{displayProducts()}</View>;
+          }
+          
+          // Hiển thị CategorySuggestionGrid nếu không có gì
+          return <CategorySuggestionGrid categories={categories} />;
+        })()}
       </RefreshWrapper>
     </View>
   );

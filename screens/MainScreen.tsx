@@ -1,23 +1,24 @@
+import TripleRingLoader from '@/components/TripleRingLoader';
+import { addToFavorites, BASE_URL, removeFromFavorites } from '@/constants/constants';
+import homeStyle from '@/styles/homeStyle';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  FlatList,
   ScrollView,
   Text,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import HomeSlider from '../components/home/HomeSlider';
-import HomeHeader from '../components/home/HomeHeader';
-import CategoryGrid from '../components/home/CategoryGrid';
-import ReviewSection from '../components/home/ReviewSection';
-import { router, useLocalSearchParams } from 'expo-router';
-import ProductCard from '../components/home/ProductCard';
-import axios from 'axios';
-import { addToFavorites, BASE_URL, removeFromFavorites } from '@/constants/constants';
-import TripleRingLoader from '@/components/TripleRingLoader';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import homeStyle from '@/styles/homeStyle';
+import CategoryGrid from '../components/home/CategoryGrid';
+import HomeHeader from '../components/home/HomeHeader';
+import HomeSlider from '../components/home/HomeSlider';
+import ProductCard from '../components/home/ProductCard';
+import ReviewSection from '../components/home/ReviewSection';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -64,8 +65,10 @@ export default function HomeScreen() {
       const userId = await AsyncStorage.getItem("user_id");
       if (!userId) return;
 
-      const resProduct = await axios.get(`${BASE_URL}/api/products`);
-      const resFav = await axios.get(`${BASE_URL}/favorites/user/${userId}`);
+      const [resProduct, resFav] = await Promise.all([
+        axios.get(`${BASE_URL}/api/products`),
+        axios.get(`${BASE_URL}/favorites/user/${userId}`)
+      ]);
 
       const favoriteIds = new Set(resFav.data.map((fav) => fav.product_platform_id));
       setFavoriteIds(favoriteIds);
@@ -139,9 +142,9 @@ export default function HomeScreen() {
         {/* Khoảng cách giữa các section */}
         <View style={homeStyle.sectionSpacing} />
         <Text style={homeStyle.sectionTitle2}>Sản phẩm nổi bật</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 16 }}>
+        {/* <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 16 }}>
           <View style={{ flexDirection: 'row' }}>
-            {products.map((item, index) => (
+            {products.slice(0, 12).map((item, index) => (
               <ProductCard
                 key={`${item.productId}-${item.productPlatformId}`}
                 productId={item.productId}
@@ -162,7 +165,37 @@ export default function HomeScreen() {
               />
             ))}
           </View>
-        </ScrollView>
+        </ScrollView> */}
+
+        <FlatList
+          data={products.slice(0, 15)}
+          keyExtractor={(item) => `${item.productId}-${item.productPlatformId}`}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <ProductCard
+              productId={item.productId}
+              productPlatformId={item.productPlatformId}
+              productName={item.productName}
+              platformLogo={item.platformLogo}
+              productImage={item.productImage}
+              currentPrice={item.currentPrice}
+              originalPrice={item.originalPrice}
+              discountPercentage={item.discountPercentage}
+              shippingFee={item.shippingFee}
+              totalPrice={item.totalPrice}
+              isAvailable={item.isAvailable}
+              rating={item.rating}
+              productUrl={item.productUrl}
+              isFavorite={favoriteIds.has(item.productPlatformId)}
+              onToggleFavorite={() =>
+                toggleFavorite(item.productId, item.productPlatformId)
+              }
+            />
+          )}
+          contentContainerStyle={{ paddingVertical: 10 }}
+        />
+
         {/* Khoảng cách giữa các section */}
 
         <ReviewSection />

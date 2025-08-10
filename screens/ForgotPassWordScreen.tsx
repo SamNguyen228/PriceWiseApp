@@ -1,23 +1,31 @@
+import TripleRingLoader from '@/components/TripleRingLoader';
+import { BASE_URL } from '@/constants/constants';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-  View,
+  Alert,
+  Image,
+  StyleSheet,
   Text,
   TextInput,
-  Image,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
+  View,
 } from 'react-native';
-import { BASE_URL } from '@/constants/constants';
+
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
- const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!email.trim()) {
       Alert.alert('Thông báo', 'Vui lòng nhập địa chỉ email!');
       return;
     }
+
+    setLoading(true);
 
     try {
       const res = await fetch(`${BASE_URL}/forgot-password`, {
@@ -35,11 +43,29 @@ export default function ForgotPasswordScreen() {
       Alert.alert('Thành công', 'Vui lòng kiểm tra email để đặt lại mật khẩu!');
     } catch (err: any) {
       Alert.alert('Lỗi', err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <TripleRingLoader />
+        <Text style={{ marginTop: 10 }}>Đang xử lí...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
+        <Ionicons name="arrow-back" size={24} color="#333" />
+      </TouchableOpacity>
+
       {/* Logo trên đầu */}
       <Image
         source={require('../assets/images/logo.png')}
@@ -57,7 +83,7 @@ export default function ForgotPasswordScreen() {
       {/* Tiêu đề */}
       <Text style={styles.title}>Quên mật khẩu ?</Text>
       <Text style={styles.subtitle}>
-        Đừng lo lắng. Vui lòng nhập{'\n'}địa chỉ email liên kết với tài khoản của bạn !
+        Đừng lo lắng. Vui lòng nhập{'\n'}địa chỉ email liên kết với tài khoản của bạn!
       </Text>
 
       {/* Input */}
@@ -71,7 +97,7 @@ export default function ForgotPasswordScreen() {
 
       {/* Nút Submit */}
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
+        <Text style={styles.buttonText}>Gửi</Text>
       </TouchableOpacity>
     </View>
   );
@@ -130,4 +156,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
   },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
+    padding: 5,
+  }
 });

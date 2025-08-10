@@ -1,21 +1,21 @@
-import React, { JSX, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Linking,
-  TouchableOpacity,
-  ScrollView,
-  useColorScheme,
-  Modal,
-  Pressable,
-} from 'react-native';
-import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Animatable from 'react-native-animatable';
-import { router } from 'expo-router';
 import RippleEffect from '@/components/RippleEffect';
 import { teamMembers } from '@/constants/teamMembers';
+import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { JSX, useState } from 'react';
+import {
+  Image,
+  Linking,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
+import * as Animatable from 'react-native-animatable';
 
 const iconMap: Record<string, (color: string) => JSX.Element> = {
   github: (color) => <FontAwesome name="github" size={20} color={color} />,

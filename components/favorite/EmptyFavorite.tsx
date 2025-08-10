@@ -1,40 +1,59 @@
 // components/EmptyState.tsx
-import { Text, View, Image, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 export default function EmptyFavorite() {
   return (
-    <View style={styles.overlayEmpty}>
-      <View style={styles.heartBox}>
-        <View style={styles.heartIcon}>
-          <Image
-            source={require('../../assets/images/heart_icon.jpg')}
-            style={{ width: 70, height: 70, resizeMode: 'contain' }}
-          />
+    <View style={styles.container}>
+      <Image
+        source={require('../../assets/images/background.jpg')}
+        style={styles.backgroundImage}
+      />
+      
+      <View style={styles.overlayEmpty}>
+        <View style={styles.heartBox}>
+          <View style={styles.heartIcon}>
+            <Image
+              source={require('../../assets/images/heart_icon.jpg')}
+              style={{ width: 70, height: 70, resizeMode: 'contain' }}
+            />
+          </View>
+          <Text style={styles.heartText}>Sản phẩm yêu thích</Text>
         </View>
-        <Text style={styles.heartText}>Sản phẩm yêu thích</Text>
-      </View>
 
-      <Text style={styles.messageText}>
-        Hiện tại chưa có sản phẩm, hãy cùng{' '}
-        <Text
-          style={styles.link}
-          onPress={() => router.push('/drawer/explore')}
-        >
-          Khám phá
-        </Text>{' '}
-        các sản phẩm
-      </Text>
+        <Text style={styles.messageText}>
+          Hiện tại chưa có sản phẩm, hãy cùng{' '}
+          <Text
+            style={styles.link}
+            onPress={() => router.push('/drawer/explore')}
+          >
+            Khám phá
+          </Text>{' '}
+          các sản phẩm
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    position: 'relative',
+  },
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    zIndex: -1,
+  },
   overlayEmpty: {
     flex: 1,
     marginTop: '40%',
     alignItems: 'center',
     paddingHorizontal: 20,
+    zIndex: 1,
   },
   heartBox: {
     backgroundColor: '#EAAE99',

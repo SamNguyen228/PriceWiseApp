@@ -1,18 +1,21 @@
+import TripleRingLoader from '@/components/TripleRingLoader';
+import { BASE_URL } from '@/constants/constants';
+import { FontAwesome } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as AuthSession from 'expo-auth-session';
+import * as Google from 'expo-auth-session/providers/google';
+import Constants from 'expo-constants';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
+  Alert,
+  Image,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
-  Image,
-  Alert,
+  View,
 } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { BASE_URL } from '@/constants/constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import TripleRingLoader from '@/components/TripleRingLoader';
 
 export default function SignInScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -21,6 +24,19 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const redirectUri = AuthSession.makeRedirectUri({
+    useProxy: true
+  });
+
+  // Cấu hình OAuth
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: Constants.expoConfig.extra.expoClientId,
+    androidClientId: Constants.expoConfig.extra.androidClientId,
+    iosClientId: Constants.expoConfig.extra.iosClientId,
+    scopes: ['profile', 'email'],
+    redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
+  });
 
   const handleComingSoon = () => {
     Alert.alert("Thông báo", "Tính năng đang phát triển");
@@ -93,6 +109,43 @@ export default function SignInScreen() {
     } catch (err) {
       const error = err as Error;
       Alert.alert("Lỗi", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.authentication!;
+      handleGoogleLogin(id_token);
+    }
+  }, [response]);
+
+  const handleGoogleLogin = async (idToken: string) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${BASE_URL}/login/google`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id_token: idToken })
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || "Đăng nhập Google thất bại");
+      }
+
+      const data = await res.json();
+      await AsyncStorage.setItem('access_token', data.access_token);
+      await AsyncStorage.setItem('user_id', data.user.id.toString());
+
+      Alert.alert("Đăng nhập thành công", `Chào ${data.user.username}!`, [
+        { text: "OK", onPress: () => router.replace('/drawer/home') }
+      ]);
+    } catch (err) {
+      Alert.alert("Lỗi", (err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -176,7 +229,7 @@ export default function SignInScreen() {
         <TouchableOpacity style={styles.socialButton} onPress={handleComingSoon}>
           <FontAwesome name="apple" size={40} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton} onPress={handleComingSoon}>
+        <TouchableOpacity style={styles.socialButton} onPress={() => promptAsync()}>
           <FontAwesome name="google" size={40} color="#DB4437" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.socialButton} onPress={handleComingSoon}>

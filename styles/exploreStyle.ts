@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-    container: {
+  container: {
     flex: 1,
     backgroundColor: '#F8F8FF',
     paddingTop: 60,
@@ -16,6 +16,15 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  searchButton: {
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#007BFF',
+    marginLeft: 8
   },
   searchInput: {
     flex: 1,
@@ -66,12 +75,13 @@ export default StyleSheet.create({
     backgroundColor: 'white',
     marginBottom: 16,
     marginHorizontal: 1,
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 6,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   heartButton: {
     padding: 5,

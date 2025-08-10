@@ -1,7 +1,7 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import exploreStyle from '@/styles/exploreStyle';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import exploreStyle from '@/styles/exploreStyle';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
   productId: number;
@@ -10,6 +10,7 @@ type Props = {
   name: string;
   price: number;
   platformName?: string;
+  platformLogo?: string;
   isFavorite: boolean;
   onToggleFavorite: () => void;
 };
@@ -21,16 +22,21 @@ export default function ProductSearchCard({
   name,
   price,
   platformName,
+  platformLogo,
   isFavorite,
   onToggleFavorite,
 }: Props) {
   return (
     <View key={`product-${productPlatformId}`} style={exploreStyle.card}>
-      <Image source={{ uri: imageUrl }} style={exploreStyle.productImage} />
-      <Text style={exploreStyle.productName}>{name}</Text>
-      <Text style={exploreStyle.price}>{price.toLocaleString()} đ</Text>
-      <Text style={exploreStyle.seller}>{platformName || name}</Text>
+      {/* Nội dung chính */}
+      <View style={{ alignItems: 'center' }}>
+        <Image source={{ uri: imageUrl }} style={exploreStyle.productImage} />
+        <Text style={exploreStyle.productName} numberOfLines={1}>{name}</Text>
+        <Text style={exploreStyle.price}>{price.toLocaleString()} đ</Text>
+        <Text style={exploreStyle.seller}>{platformName || name}</Text>
+      </View>
 
+      {/* Footer luôn nằm ở cuối */}
       <View style={exploreStyle.cardFooter}>
         <TouchableOpacity
           style={exploreStyle.compareButton}

@@ -1,14 +1,14 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Linking,
-  StyleSheet,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import React from 'react';
+import {
+  Image,
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function FavoriteProductCard({
   item,
@@ -29,7 +29,7 @@ export default function FavoriteProductCard({
         <Image source={{ uri: pf.product.image_url }} style={styles.image} />
       </View>
 
-      <Text style={styles.cardTitle}>{pf.product.name}</Text>
+      <Text style={styles.cardTitle} numberOfLines={1}>{pf.product.name}</Text>
       <Text style={styles.discount}>
         {pf.price.toLocaleString()}₫ - {pf.discount_percentage}%
       </Text>
@@ -68,7 +68,9 @@ export default function FavoriteProductCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: '47%',
+     flex: 1,
+  maxWidth: '48%',
+  margin: 5,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
@@ -81,6 +83,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 6,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   platformLogo: {
     width: 32,

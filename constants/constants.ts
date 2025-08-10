@@ -1,7 +1,8 @@
 
 import axios from 'axios';
 
-export const BASE_URL = "your_url_example";
+export const BASE_URL = "http://192.168.23.138:8000";
+// export const BASE_URL = "https://pricewiseapp.onrender.com";
 
 const api = axios.create({
     baseURL: BASE_URL,
@@ -27,7 +28,6 @@ export const addToFavorites = (productId: number, userId: number, productPlatfor
     product_platform_id: productPlatformId,
   });
 };
-
 
 export const removeFromFavorites = (productId: number, userId: number, productPlatformId: number) => {
   return axios.delete(`${BASE_URL}/favorites/remove`, {

@@ -2,10 +2,19 @@
   "expo": {
     "name": "PriceWise",
     "slug": "PriceWise",
+    "owner": "samwison",
+    "extra": {
+      "expoClientId": "224343295085-4ih96chuavcc2m4ga5mscpglikt763qh.apps.googleusercontent.com",
+      "androidClientId": "224343295085-t26l756f6ptrc4qi5lbf4914bmh56pq2.apps.googleusercontent.com",
+      "iosClientId": "224343295085-2ue3rif4kc9euda0d6s3lauuuo4rfuqa.apps.googleusercontent.com"
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "pricewise",
+    "deepLinks": [
+      "pricewise://reset-password/:user_id"
+    ],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -33,7 +42,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

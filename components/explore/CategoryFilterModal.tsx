@@ -1,6 +1,6 @@
-import { View, Text, Modal, TouchableOpacity, Button } from 'react-native';
-import { router } from 'expo-router';
 import exploreStyle from '@/styles/exploreStyle';
+import { router } from 'expo-router';
+import { Button, Modal, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
   visible: boolean;

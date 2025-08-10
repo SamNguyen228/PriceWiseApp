@@ -314,6 +314,7 @@ export default StyleSheet.create ({
   // style đánh giá
   ratingTitle: {
     fontSize: 20,
+    marginBottom: 20
   },
   userReviewsContainer: {
     marginTop: 24,

@@ -1,17 +1,17 @@
+import EmptyFavorite from '@/components/favorite/EmptyFavorite';
+import FavoriteProductCard from '@/components/favorite/FavoriteProductCard';
+import TripleRingLoader from "@/components/TripleRingLoader";
+import { addToFavorites, BASE_URL, removeFromFavorites } from "@/constants/constants";
+import favoriteStyle from "@/styles/favoriteStyle";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
-  View,
+  Alert,
+  FlatList,
   Text,
-  ScrollView,
-  Alert
+  View
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import TripleRingLoader from "@/components/TripleRingLoader";
-import { addToFavorites, removeFromFavorites, BASE_URL } from "@/constants/constants";
-import FavoriteProductCard from '@/components/favorite/FavoriteProductCard';
-import EmptyFavorite from '@/components/favorite/EmptyFavorite';
-import favoriteStyle from "@/styles/favoriteStyle";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface FavoriteProduct {
@@ -40,7 +40,7 @@ interface FavoriteProduct {
   };
 }
 
-export default function YeuThichScreen() {
+export default function Favorite() {
   const navigation = useNavigation();
   const [favorites, setFavorites] = useState<FavoriteProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,11 +108,11 @@ export default function YeuThichScreen() {
         setFavorites((prev) =>
           prev.filter((f) => f.product_platform_id !== productPlatformId)
         );
-        Alert.alert("Đã xoá khỏi yêu thích");
+        Alert.alert("Thông Báo", "Đã xoá khỏi yêu thích");
       } else {
         await addToFavorites(productId, userId, productPlatformId);
         setFavoriteIds((prev) => new Set(prev).add(productPlatformId));
-        Alert.alert("Đã thêm vào yêu thích");
+        Alert.alert("Thông Báo", "Đã thêm vào yêu thích");
       }
     } catch (error) {
       console.error("Lỗi khi xử lý yêu thích:", error);
@@ -136,26 +136,52 @@ export default function YeuThichScreen() {
       {favorites.length === 0 ? (
         <EmptyFavorite />
       ) : (
-        <ScrollView contentContainerStyle={favoriteStyle.scrollContent}>
-          <View style={favoriteStyle.fullWidthCenter}>
-            <Text style={favoriteStyle.resultTitle}>Danh sách sản phẩm yêu thích</Text>
-          </View>
-          <View style={favoriteStyle.rowWrap}>
-            {favorites.map((item) => (
-              <FavoriteProductCard
-                key={item.favorite_id}
-                item={item}
-                isFavorite={favoriteIds.has(item.product_platform_id)}
-                onToggleFavorite={() =>
-                  toggleFavorite(
-                    item.product_platform.product.product_id,
-                    item.product_platform_id
-                  )
-                }
-              />
-            ))}
-          </View>
-        </ScrollView>
+        // <ScrollView contentContainerStyle={favoriteStyle.scrollContent}>
+        //   <View style={favoriteStyle.fullWidthCenter}>
+        //     <Text style={favoriteStyle.resultTitle}>Danh sách sản phẩm yêu thích</Text>
+        //   </View>
+        //   <View style={favoriteStyle.rowWrap}>
+        //     {favorites.map((item) => (
+        //       <FavoriteProductCard
+        //         key={item.favorite_id}
+        //         item={item}
+        //         isFavorite={favoriteIds.has(item.product_platform_id)}
+        //         onToggleFavorite={() =>
+        //           toggleFavorite(
+        //             item.product_platform.product.product_id,
+        //             item.product_platform_id
+        //           )
+        //         }
+        //       />
+        //     ))}
+        //   </View>
+        // </ScrollView>
+
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => item.favorite_id.toString()}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: 'space-between', paddingHorizontal: 10 }}
+          contentContainerStyle={favoriteStyle.scrollContent}
+          ListHeaderComponent={() => (
+            <View style={favoriteStyle.fullWidthCenter}>
+              <Text style={favoriteStyle.resultTitle}>Danh sách sản phẩm yêu thích</Text>
+            </View>
+          )}
+          renderItem={({ item }) => (
+            <FavoriteProductCard
+              item={item}
+              isFavorite={favoriteIds.has(item.product_platform_id)}
+              onToggleFavorite={() =>
+                toggleFavorite(
+                  item.product_platform.product.product_id,
+                  item.product_platform_id
+                )
+              }
+            />
+          )}
+        />
+
       )}
     </SafeAreaView>
   );
